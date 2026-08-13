@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TE Auto Core Assembly — PIN Change Record</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFF6FF;
+    --surface:#FFFFFF;
+    --ink:#0B2036;
+    --ink-soft:#4C6480;
+    --ink-faint:#93A7BC;
+    --line:#DCEBFB;
+    --blue:#0B72E7;
+    --blue-dark:#0857B3;
+    --blue-deep:#083E82;
+    --sky:#1BA6E8;
+    --blue-light:#E8F3FE;
+    --blue-light-2:#F3F9FF;
+    --green:#128A5C;
+    --green-bg:#E4F6ED;
+    --red:#C0362B;
+    --red-bg:#FBEAE8;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(11,32,54,0.05), 0 10px 28px rgba(11,114,231,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans","IBM Plex Sans Thai",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .mono{font-family:"IBM Plex Mono","IBM Plex Sans Thai",monospace;}
+
+  /* ---------- header ---------- */
+  header{
+    background:linear-gradient(135deg,var(--blue-deep) 0%, var(--blue) 55%, var(--sky) 100%);
+    color:#fff;
+    padding:26px 18px 30px;
+    position:relative;
+    overflow:hidden;
+  }
+  header .dots{
+    position:absolute; inset:0; opacity:.16;
+    background-image:radial-gradient(#fff 1.4px, transparent 1.4px);
+    background-size:18px 18px;
+    -webkit-mask-image:linear-gradient(180deg,#000 0%, transparent 85%);
+            mask-image:linear-gradient(180deg,#000 0%, transparent 85%);
+  }
+  .header-inner{max-width:800px;margin:0 auto;position:relative;}
+  .brand-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .brand-mark{
+    width:30px;height:30px;border-radius:8px;
+    background:#fff; color:var(--blue-dark);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700; font-size:14px; font-family:"IBM Plex Mono",monospace;
+    flex:0 0 auto;
+  }
+  .eyebrow{
+    font-size:12px; letter-spacing:.02em;
+    color:#DCEEFC; margin:0; line-height:1.5;
+  }
+  .eyebrow b{color:#fff;font-weight:600;}
+  h1{
+    font-size:27px; line-height:1.2; font-weight:700;
+    margin:0 0 4px; letter-spacing:-0.01em;
+  }
+  h1 .accent{color:#BFE3FF;}
+  .th-title{
+    font-size:15px; color:#DCEEFC; font-weight:400; margin:0 0 16px;
+  }
+  .header-meta{
+    display:flex; flex-wrap:wrap; gap:8px 18px;
+    font-size:12px; color:#BFDBF3;
+  }
+  .header-meta span b{color:#fff;font-weight:600;}
+
+  /* ---------- layout ---------- */
+  main{max-width:800px;margin:0 auto;padding:20px 16px 60px;}
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:20px 18px;
+    margin-bottom:16px;
+    transition:opacity .2s;
+  }
+  .card.disabled{opacity:.45; pointer-events:none;}
+  .section-label{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .section-label .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:22px;height:22px;border-radius:7px;
+    background:var(--blue); color:#fff;
+    font-size:11px; font-weight:600; margin-right:8px;
+  }
+  .section-label .en{font-size:15px;font-weight:600;color:var(--ink);}
+  .section-label .th{font-size:12.5px;color:var(--ink-soft);margin-left:6px;}
+
+  label.field-label{
+    display:block; font-size:13px; font-weight:500; color:var(--ink);
+    margin-bottom:6px;
+  }
+  label.field-label .th{color:var(--ink-soft);font-weight:400;}
+  input[type=text], input[type=password], textarea{
+    width:100%; font-family:inherit; font-size:15px;
+    padding:11px 12px; border:1.5px solid var(--line); border-radius:10px;
+    background:var(--blue-light-2); color:var(--ink);
+    outline:none; transition:border-color .15s, box-shadow .15s;
+  }
+  input:focus, textarea:focus{
+    border-color:var(--blue); box-shadow:0 0 0 3px rgba(11,114,231,0.12);
+    background:#fff;
+  }
+  textarea{resize:vertical; min-height:64px;}
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .hint{font-size:11.5px;color:var(--ink-faint);margin-top:8px;}
+
+  /* ---------- station rail (signature element, 18 lines) ---------- */
+  .rail-wrap{overflow-x:auto; padding:6px 2px 12px; margin:0 -2px;
+    -webkit-overflow-scrolling:touch; scrollbar-width:thin;}
+  .rail{
+    display:flex; align-items:center; gap:0; min-width:max-content;
+    position:relative;
+  }
+  .rail-node{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    cursor:pointer; padding:2px 9px; user-select:none;
+  }
+  .rail-dot{
+    width:36px; height:36px; border-radius:10px;
+    background:var(--blue-light-2); border:1.5px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:600;
+    color:var(--ink-soft);
+    transition:all .15s;
+  }
+  .rail-node .rail-label{font-size:9.5px;color:var(--ink-faint);font-weight:500;}
+  .rail-connector{width:16px;height:2px;background:var(--line);flex:0 0 auto;margin-top:-18px;}
+  .rail-node.active .rail-dot{
+    background:var(--blue); border-color:var(--blue);
+    color:#fff; transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(11,114,231,0.30);
+  }
+  .rail-node.active .rail-label{color:var(--blue-dark);font-weight:600;}
+  .rail-node:hover .rail-dot{border-color:var(--blue);}
+
+  /* ---------- model chips ---------- */
+  .model-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+  @media (min-width:520px){ .model-grid{grid-template-columns:repeat(4,1fr);} }
+  .model-chip{
+    padding:14px 8px; text-align:center; border-radius:12px;
+    border:1.5px solid var(--line); background:var(--blue-light-2);
+    cursor:pointer; transition:all .15s;
+  }
+  .model-chip .en{font-size:14.5px;font-weight:700;color:var(--ink);}
+  .model-chip .sub{display:block;font-size:10.5px;font-weight:400;color:var(--ink-faint);margin-top:3px;}
+  .model-chip.active{
+    background:var(--blue); border-color:var(--blue);
+  }
+  .model-chip.active .en{color:#fff;}
+  .model-chip.active .sub{color:#D6EBFF;}
+
+  /* ---------- generic selectable grid (Product / Station) ---------- */
+  .sel-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(52px,1fr)); gap:8px;}
+  .sel-chip{
+    position:relative;
+    padding:10px 4px; text-align:center; border-radius:9px;
+    border:1.5px solid var(--line); background:var(--blue-light-2);
+    cursor:pointer; font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px; font-weight:600; color:var(--ink-soft);
+    transition:all .15s;
+  }
+  .sel-chip.active{
+    background:var(--blue); border-color:var(--blue); color:#fff;
+  }
+  .sel-chip.multi.active::after{
+    content:"✓"; position:absolute; top:-6px; right:-6px;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--green); color:#fff; font-size:10px;
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid #fff;
+  }
+  .sel-toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;}
+  .sel-toolbar button{
+    background:none;border:none;color:var(--blue);font-size:12px;font-weight:600;
+    cursor:pointer;font-family:inherit;padding:4px 0;
+  }
+  .sel-count{font-size:12px;color:var(--ink-faint);}
+  .placeholder-msg{font-size:12.5px;color:var(--ink-faint);padding:6px 2px;}
+
+  /* ---------- PIN entry ---------- */
+  .pin-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:420px){ .pin-row{grid-template-columns:1fr;} }
+  .pin-input-wrap{position:relative;}
+  .pin-input-wrap input{padding-right:44px; font-family:"IBM Plex Mono",monospace; letter-spacing:.04em;}
+  .pin-toggle-btn{
+    position:absolute; right:8px; top:50%; transform:translateY(-50%);
+    background:none; border:none; cursor:pointer; color:var(--blue);
+    font-size:11.5px; font-weight:600; padding:6px;
+  }
+  .pin-note{
+    display:flex; gap:8px; align-items:flex-start;
+    background:var(--blue-light); border:1px solid #C9E4FB;
+    border-radius:10px; padding:10px 12px; margin-top:14px;
+    font-size:12px; color:var(--blue-deep); line-height:1.5;
+  }
+
+  /* ---------- submit ---------- */
+  .submit-btn{
+    width:100%; padding:15px; border:none; border-radius:12px;
+    background:linear-gradient(135deg,var(--blue) 0%, var(--sky) 100%);
+    color:#fff; font-size:15.5px; font-weight:600;
+    cursor:pointer; font-family:inherit; letter-spacing:.01em;
+    transition:opacity .15s, transform .1s;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    box-shadow:0 10px 24px rgba(11,114,231,0.28);
+  }
+  .submit-btn:active{transform:scale(0.99);}
+  .submit-btn:disabled{opacity:.55;cursor:not-allowed;box-shadow:none;}
+  .submit-btn:not(:disabled):hover{opacity:.92;}
+
+  .status-banner{
+    display:none; align-items:flex-start; gap:10px;
+    border-radius:10px; padding:12px 14px; margin-bottom:16px;
+    font-size:13.5px; line-height:1.5;
+  }
+  .status-banner.show{display:flex;}
+  .status-banner.ok{background:var(--green-bg); color:#0E5C3E; border:1px solid #BFE6D2;}
+  .status-banner.err{background:var(--red-bg); color:#7D211A; border:1px solid #F3C4BF;}
+  .status-banner b{display:block;margin-bottom:2px;}
+
+  .req::after{content:" *"; color:var(--blue);}
+
+  footer{
+    max-width:800px;margin:0 auto;padding:0 16px 30px;
+    font-size:11.5px;color:var(--ink-faint);text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="dots"></div>
+  <div class="header-inner">
+    <div class="brand-row">
+      <div class="brand-mark">TE</div>
+      <p class="eyebrow"><b>Delta Electronics (Thailand) PCL.</b><br>บริษัท เดลต้าอีเลคโทรนิคส์ (ประเทศไทย) จำกัด (มหาชน)</p>
+    </div>
+    <h1>TE <span class="accent">Auto Core</span> Assembly</h1>
+    <p class="th-title">ระบบบันทึกการเปลี่ยนพิน — สายการประกอบแกนอัตโนมัติ (PIN Change Record)</p>
+    <div class="header-meta">
+      <span>Developed by <b>TE Pongnupa (Boat)</b></span>
+      <span id="clock-display"></span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="status-banner" class="status-banner"></div>
+
+  <form id="pin-form">
+
+    <!-- Recorder -->
+    <div class="card">
+      <div class="section-label">
+        <div><span class="num">1</span><span class="en">Recorder</span><span class="th">ผู้บันทึก</span></div>
+      </div>
+      <div class="field">
+        <label class="field-label req">Sender name <span class="th">ชื่อผู้ส่ง</span></label>
+        <input type="text" id="senderName" name="senderName" placeholder="e.g. Somchai Jaidee" autocomplete="name" required>
+      </div>
+    </div>
+
+    <!-- Production line -->
+    <div class="card">
+      <div class="section-label">
+        <div><span class="num">2</span><span class="en">Production line</span><span class="th">สายการผลิต</span></div>
+      </div>
+      <div class="rail-wrap">
+        <div class="rail" id="line-rail"></div>
+      </div>
+      <p class="hint">Select the assembly line / เลือกสายการผลิต (A-CORE-01 – A-CORE-18)</p>
+    </div>
+
+    <!-- Model -->
+    <div class="card">
+      <div class="section-label">
+        <div><span class="num">3</span><span class="en">Model</span><span class="th">รุ่นโมเดล</span></div>
+      </div>
+      <div class="model-grid" id="model-grid"></div>
+      <p class="hint">Choosing a model sets the available Product and Station range below. / เลือกโมเดลเพื่อกำหนดช่วง Product และ Station ด้านล่าง</p>
+    </div>
+
+    <!-- Product -->
+    <div class="card" id="product-card">
+      <div class="section-label">
+        <div><span class="num">4</span><span class="en">Product</span><span class="th">โปรดักต์</span></div>
+        <span class="sel-count" id="product-count"></span>
+      </div>
+      <div id="product-grid" class="sel-grid"></div>
+      <p class="placeholder-msg" id="product-placeholder">Select a model first / กรุณาเลือกรุ่นโมเดลก่อน</p>
+    </div>
+
+    <!-- Station -->
+    <div class="card" id="station-card">
+      <div class="section-label">
+        <div><span class="num">5</span><span class="en">Station</span><span class="th">ตำแหน่ง L</span></div>
+      </div>
+      <div class="sel-toolbar">
+        <span class="sel-count" id="l-count">0 selected · เลือกแล้ว 0 ตำแหน่ง</span>
+        <button type="button" id="l-clear">Clear — ล้าง</button>
+      </div>
+      <div id="l-grid" class="sel-grid"></div>
+      <p class="placeholder-msg" id="station-placeholder">Select a model first / กรุณาเลือกรุ่นโมเดลก่อน</p>
+      <p class="hint" id="station-hint" style="display:none;">Choose any station(s) for this product — multiple selections allowed. / เลือกได้มากกว่า 1 ตำแหน่ง</p>
+    </div>
+
+    <!-- PIN details -->
+    <div class="card">
+      <div class="section-label">
+        <div><span class="num">6</span><span class="en">PIN details</span><span class="th">ข้อมูลพิน</span></div>
+      </div>
+      <div class="pin-row">
+        <div class="field">
+          <label class="field-label req">Old PIN <span class="th">พินเดิม</span></label>
+          <div class="pin-input-wrap">
+            <input type="password" id="oldPin" name="oldPin" inputmode="numeric" pattern="[0-9]*" placeholder="••••" required>
+            <button type="button" class="pin-toggle-btn" data-target="oldPin">SHOW</button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label req">New PIN <span class="th">พินใหม่</span></label>
+          <div class="pin-input-wrap">
+            <input type="password" id="newPin" name="newPin" inputmode="numeric" pattern="[0-9]*" placeholder="••••" required>
+            <button type="button" class="pin-toggle-btn" data-target="newPin">SHOW</button>
+          </div>
+        </div>
+      </div>
+      <div class="pin-note">
+        <span>ⓘ</span>
+        <span>Enter the exact old and new PIN numbers — double-check before saving. / กรอกตัวเลขพินเดิมและพินใหม่ให้ถูกต้อง ตรวจสอบก่อนบันทึก</span>
+      </div>
+    </div>
+
+    <!-- Remark -->
+    <div class="card">
+      <div class="section-label">
+        <div><span class="num">7</span><span class="en">Remark</span><span class="th">หมายเหตุ</span><span class="th" style="margin-left:6px;color:var(--ink-faint)">(optional / ไม่บังคับ)</span></div>
+      </div>
+      <textarea id="remark" name="remark" placeholder="Additional notes…"></textarea>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submit-btn">Save record — บันทึกข้อมูล</button>
+  </form>
+</main>
+
+<footer>
+  TE Auto Core Assembly · Delta Electronics (Thailand) PCL. · Internal use only<br>
+  Data is saved to Google Sheets — “PIN change record”
+</footer>
+
+<script>
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbwUwKHP6AGPjhhn_jWa3KofAhAb4d16xwGYf1mZkoj8rc6g2bUbkWYMGlIWIeiokYov6A/exec";
+
+  // Model -> Product count / Station count
+  const MODEL_CONFIG = {
+    "BGA2.0": { products: 4,  stations: 16, sub: "P1–P4 · L1–L16" },
+    "A2":     { products: 4,  stations: 16, sub: "P1–P4 · L1–L16" },
+    "U50SU":  { products: 36, stations: 1,  sub: "P1–P36 · L1" },
+    "D50":    { products: 9,  stations: 2,  sub: "P1–P9 · L1–L2" }
+  };
+
+  // ---- clock ----
+  function updateClock(){
+    const now = new Date();
+    const opts = {timeZone:'Asia/Bangkok', hour12:false, year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'};
+    document.getElementById('clock-display').textContent = now.toLocaleString('en-GB', opts) + ' ICT';
+  }
+  updateClock(); setInterval(updateClock, 1000);
+
+  // ---- state ----
+  let state = { line: null, model: null, product: null, stations: new Set() };
+
+  // ---- build line rail A-CORE-01..18 ----
+  const railEl = document.getElementById('line-rail');
+  for(let i=1;i<=18;i++){
+    const code = 'A-CORE-' + String(i).padStart(2,'0');
+    const node = document.createElement('div');
+    node.className = 'rail-node';
+    node.dataset.line = code;
+    node.innerHTML = `<div class="rail-dot mono">${String(i).padStart(2,'0')}</div><div class="rail-label">CORE-${String(i).padStart(2,'0')}</div>`;
+    node.addEventListener('click', ()=>{
+      document.querySelectorAll('.rail-node').forEach(n=>n.classList.remove('active'));
+      node.classList.add('active');
+      state.line = code;
+    });
+    railEl.appendChild(node);
+    if(i<18){
+      const conn = document.createElement('div');
+      conn.className = 'rail-connector';
+      railEl.appendChild(conn);
+    }
+  }
+
+  // ---- build model chips ----
+  const modelGrid = document.getElementById('model-grid');
+  Object.keys(MODEL_CONFIG).forEach(name=>{
+    const cfg = MODEL_CONFIG[name];
+    const chip = document.createElement('div');
+    chip.className = 'model-chip';
+    chip.innerHTML = `<div class="en">${name}</div><span class="sub">${cfg.sub}</span>`;
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('.model-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      state.model = name;
+      state.product = null;
+      state.stations.clear();
+      buildProductGrid(cfg.products);
+      buildStationGrid(cfg.stations);
+    });
+    modelGrid.appendChild(chip);
+  });
+
+  // ---- Product grid (single-select, size depends on model) ----
+  const productGrid = document.getElementById('product-grid');
+  const productPlaceholder = document.getElementById('product-placeholder');
+  const productCount = document.getElementById('product-count');
+  function buildProductGrid(count){
+    productGrid.innerHTML = '';
+    productPlaceholder.style.display = 'none';
+    productCount.textContent = `P1–P${count}`;
+    for(let i=1;i<=count;i++){
+      const code = 'P'+i;
+      const chip = document.createElement('div');
+      chip.className = 'sel-chip mono';
+      chip.textContent = code;
+      chip.addEventListener('click', ()=>{
+        document.querySelectorAll('#product-grid .sel-chip').forEach(c=>c.classList.remove('active'));
+        chip.classList.add('active');
+        state.product = code;
+      });
+      productGrid.appendChild(chip);
+    }
+  }
+
+  // ---- Station grid (multi-select, size depends on model) ----
+  const lGrid = document.getElementById('l-grid');
+  const lCountEl = document.getElementById('l-count');
+  const stationPlaceholder = document.getElementById('station-placeholder');
+  const stationHint = document.getElementById('station-hint');
+  function updateLCount(){
+    lCountEl.textContent = `${state.stations.size} selected · เลือกแล้ว ${state.stations.size} ตำแหน่ง`;
+  }
+  function buildStationGrid(count){
+    lGrid.innerHTML = '';
+    stationPlaceholder.style.display = 'none';
+    stationHint.style.display = 'block';
+    for(let i=1;i<=count;i++){
+      const code = 'L'+i;
+      const chip = document.createElement('div');
+      chip.className = 'sel-chip multi mono';
+      chip.textContent = code;
+      chip.addEventListener('click', ()=>{
+        if(state.stations.has(code)){
+          state.stations.delete(code);
+          chip.classList.remove('active');
+        }else{
+          state.stations.add(code);
+          chip.classList.add('active');
+        }
+        updateLCount();
+      });
+      lGrid.appendChild(chip);
+    }
+    updateLCount();
+  }
+  document.getElementById('l-clear').addEventListener('click', ()=>{
+    state.stations.clear();
+    document.querySelectorAll('.sel-chip.multi').forEach(c=>c.classList.remove('active'));
+    updateLCount();
+  });
+
+  // ---- PIN show/hide ----
+  document.querySelectorAll('.pin-toggle-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const input = document.getElementById(btn.dataset.target);
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.textContent = showing ? 'SHOW' : 'HIDE';
+    });
+  });
+
+  // ---- status banner ----
+  function showStatus(kind, titleEn, titleTh, bodyEn){
+    const el = document.getElementById('status-banner');
+    el.className = 'status-banner show ' + kind;
+    el.innerHTML = `<span>${kind==='ok' ? '✓' : '!'}</span><span><b>${titleEn} · ${titleTh}</b>${bodyEn}</span>`;
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  // ---- submit ----
+  const form = document.getElementById('pin-form');
+  const submitBtn = document.getElementById('submit-btn');
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+
+    const senderName = document.getElementById('senderName').value.trim();
+    const oldPin = document.getElementById('oldPin').value.trim();
+    const newPin = document.getElementById('newPin').value.trim();
+    const remark = document.getElementById('remark').value.trim();
+
+    if(!senderName){ showStatus('err','Missing sender name','กรุณากรอกชื่อผู้ส่ง',''); return; }
+    if(!state.line){ showStatus('err','Select a production line','กรุณาเลือกสายการผลิต',''); return; }
+    if(!state.model){ showStatus('err','Select a model','กรุณาเลือกรุ่นโมเดล',''); return; }
+    if(!state.product){ showStatus('err','Select a product','กรุณาเลือกโปรดักต์',''); return; }
+    if(state.stations.size === 0){ showStatus('err','Select at least one station (L)','กรุณาเลือกตำแหน่ง L อย่างน้อย 1 ตำแหน่ง',''); return; }
+    if(!oldPin || !newPin){ showStatus('err','Enter old and new PIN','กรุณากรอกพินเดิมและพินใหม่',''); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving… — กำลังบันทึก…';
+
+    const now = new Date();
+    const timestamp = now.toLocaleString('en-GB', {timeZone:'Asia/Bangkok'});
+    const stationList = Array.from(state.stations);
+
+    try{
+      // One row per selected station, so every recorded station is saved to Google Sheets
+      for(const station of stationList){
+        const payload = new FormData();
+        payload.append('timestamp', timestamp);
+        payload.append('senderName', senderName);
+        payload.append('line', state.line);
+        payload.append('model', state.model);
+        payload.append('product', state.product);
+        payload.append('station', station);
+        payload.append('oldPin', oldPin);
+        payload.append('newPin', newPin);
+        payload.append('remark', remark);
+        await fetch(GAS_URL, { method:'POST', mode:'no-cors', body: payload });
+      }
+
+      showStatus('ok','Record saved','บันทึกข้อมูลสำเร็จ',
+        `<br>${senderName} · ${state.line} · ${state.model} · ${state.product} · ${stationList.join(', ')} · ${timestamp} ICT`);
+
+      form.reset();
+      document.querySelectorAll('.rail-node, .model-chip, .sel-chip').forEach(n=>n.classList.remove('active'));
+      state = { line:null, model:null, product:null, stations:new Set() };
+      productGrid.innerHTML = '';
+      lGrid.innerHTML = '';
+      productPlaceholder.style.display = 'block';
+      stationPlaceholder.style.display = 'block';
+      stationHint.style.display = 'none';
+      productCount.textContent = '';
+      updateLCount();
+      document.querySelectorAll('.pin-toggle-btn').forEach(b=>b.textContent='SHOW');
+      document.querySelectorAll('#oldPin, #newPin').forEach(i=>i.type='password');
+
+    }catch(err){
+      showStatus('err','Could not save — check your connection','ไม่สามารถบันทึกได้ กรุณาตรวจสอบการเชื่อมต่อ','');
+    }finally{
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Save record — บันทึกข้อมูล';
+    }
+  });
+</script>
+
+</body>
+</html>

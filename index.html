@@ -204,12 +204,7 @@
   .pin-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   @media (max-width:420px){ .pin-row{grid-template-columns:1fr;} }
   .pin-input-wrap{position:relative;}
-  .pin-input-wrap input{padding-right:44px; font-family:"IBM Plex Mono",monospace; letter-spacing:.04em;}
-  .pin-toggle-btn{
-    position:absolute; right:8px; top:50%; transform:translateY(-50%);
-    background:none; border:none; cursor:pointer; color:var(--blue);
-    font-size:11.5px; font-weight:600; padding:6px;
-  }
+  .pin-input-wrap input{font-family:"IBM Plex Mono",monospace; letter-spacing:.04em;}
   .pin-note{
     display:flex; gap:8px; align-items:flex-start;
     background:var(--blue-light); border:1px solid #C9E4FB;
@@ -336,15 +331,13 @@
         <div class="field">
           <label class="field-label req">Old PIN <span class="th">พินเดิม</span></label>
           <div class="pin-input-wrap">
-            <input type="password" id="oldPin" name="oldPin" inputmode="numeric" pattern="[0-9]*" placeholder="••••" required>
-            <button type="button" class="pin-toggle-btn" data-target="oldPin">SHOW</button>
+            <input type="text" id="oldPin" name="oldPin" inputmode="numeric" pattern="[0-9]*" placeholder="0000" required>
           </div>
         </div>
         <div class="field">
           <label class="field-label req">New PIN <span class="th">พินใหม่</span></label>
           <div class="pin-input-wrap">
-            <input type="password" id="newPin" name="newPin" inputmode="numeric" pattern="[0-9]*" placeholder="••••" required>
-            <button type="button" class="pin-toggle-btn" data-target="newPin">SHOW</button>
+            <input type="text" id="newPin" name="newPin" inputmode="numeric" pattern="[0-9]*" placeholder="0000" required>
           </div>
         </div>
       </div>
@@ -492,16 +485,6 @@
     updateLCount();
   });
 
-  // ---- PIN show/hide ----
-  document.querySelectorAll('.pin-toggle-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const input = document.getElementById(btn.dataset.target);
-      const showing = input.type === 'text';
-      input.type = showing ? 'password' : 'text';
-      btn.textContent = showing ? 'SHOW' : 'HIDE';
-    });
-  });
-
   // ---- status banner ----
   function showStatus(kind, titleEn, titleTh, bodyEn){
     const el = document.getElementById('status-banner');
@@ -565,8 +548,6 @@
       stationHint.style.display = 'none';
       productCount.textContent = '';
       updateLCount();
-      document.querySelectorAll('.pin-toggle-btn').forEach(b=>b.textContent='SHOW');
-      document.querySelectorAll('#oldPin, #newPin').forEach(i=>i.type='password');
 
     }catch(err){
       showStatus('err','Could not save — check your connection','ไม่สามารถบันทึกได้ กรุณาตรวจสอบการเชื่อมต่อ','');

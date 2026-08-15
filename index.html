@@ -289,10 +289,19 @@
       <p class="hint">Select the assembly line / เลือกสายการผลิต (A-CORE-01 – A-CORE-18)</p>
     </div>
 
+    <!-- Machine -->
+    <div class="card">
+      <div class="section-label">
+        <div><span class="num">3</span><span class="en">Machine</span><span class="th">เครื่องจักร</span></div>
+      </div>
+      <div class="model-grid" id="machine-grid"></div>
+      <p class="hint">Select the machine used / เลือกเครื่องจักรที่ใช้งาน</p>
+    </div>
+
     <!-- Model -->
     <div class="card">
       <div class="section-label">
-        <div><span class="num">3</span><span class="en">Model</span><span class="th">รุ่นโมเดล</span></div>
+        <div><span class="num">4</span><span class="en">Model</span><span class="th">รุ่นโมเดล</span></div>
       </div>
       <div class="model-grid" id="model-grid"></div>
       <p class="hint">Choosing a model sets the available Product and Station range below. / เลือกโมเดลเพื่อกำหนดช่วง Product และ Station ด้านล่าง</p>
@@ -301,7 +310,7 @@
     <!-- Product -->
     <div class="card" id="product-card">
       <div class="section-label">
-        <div><span class="num">4</span><span class="en">Product</span><span class="th">โปรดักต์</span></div>
+        <div><span class="num">5</span><span class="en">Product</span><span class="th">โปรดักต์</span></div>
         <span class="sel-count" id="product-count"></span>
       </div>
       <div id="product-grid" class="sel-grid"></div>
@@ -311,7 +320,7 @@
     <!-- Station -->
     <div class="card" id="station-card">
       <div class="section-label">
-        <div><span class="num">5</span><span class="en">Station</span><span class="th">ตำแหน่ง L</span></div>
+        <div><span class="num">6</span><span class="en">Station</span><span class="th">ตำแหน่ง L</span></div>
       </div>
       <div class="sel-toolbar">
         <span class="sel-count" id="l-count">0 selected · เลือกแล้ว 0 ตำแหน่ง</span>
@@ -325,7 +334,7 @@
     <!-- PIN details -->
     <div class="card">
       <div class="section-label">
-        <div><span class="num">6</span><span class="en">PIN details</span><span class="th">ข้อมูลพิน</span></div>
+        <div><span class="num">7</span><span class="en">PIN details</span><span class="th">ข้อมูลพิน</span></div>
       </div>
       <div class="pin-row">
         <div class="field">
@@ -350,7 +359,7 @@
     <!-- Remark -->
     <div class="card">
       <div class="section-label">
-        <div><span class="num">7</span><span class="en">Remark</span><span class="th">หมายเหตุ</span><span class="th" style="margin-left:6px;color:var(--ink-faint)">(optional / ไม่บังคับ)</span></div>
+        <div><span class="num">8</span><span class="en">Remark</span><span class="th">หมายเหตุ</span><span class="th" style="margin-left:6px;color:var(--ink-faint)">(optional / ไม่บังคับ)</span></div>
       </div>
       <textarea id="remark" name="remark" placeholder="Additional notes…"></textarea>
     </div>
@@ -375,6 +384,8 @@
     "D50":    { products: 9,  stations: 2,  sub: "P1–P9 · L1–L2" }
   };
 
+  const MACHINES = ["Auto Inductance 01", "Auto Inductance 02"];
+
   // ---- clock ----
   function updateClock(){
     const now = new Date();
@@ -384,7 +395,7 @@
   updateClock(); setInterval(updateClock, 1000);
 
   // ---- state ----
-  let state = { line: null, model: null, product: null, stations: new Set() };
+  let state = { line: null, machine: null, model: null, product: null, stations: new Set() };
 
   // ---- build line rail A-CORE-01..18 ----
   const railEl = document.getElementById('line-rail');
@@ -407,6 +418,20 @@
     }
   }
 
+  // ---- build machine chips ----
+  const machineGrid = document.getElementById('machine-grid');
+  MACHINES.forEach(name=>{
+    const chip = document.createElement('div');
+    chip.className = 'model-chip';
+    chip.innerHTML = `<div class="en">${name}</div>`;
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('#machine-grid .model-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      state.machine = name;
+    });
+    machineGrid.appendChild(chip);
+  });
+
   // ---- build model chips ----
   const modelGrid = document.getElementById('model-grid');
   Object.keys(MODEL_CONFIG).forEach(name=>{
@@ -415,7 +440,7 @@
     chip.className = 'model-chip';
     chip.innerHTML = `<div class="en">${name}</div><span class="sub">${cfg.sub}</span>`;
     chip.addEventListener('click', ()=>{
-      document.querySelectorAll('.model-chip').forEach(c=>c.classList.remove('active'));
+      document.querySelectorAll('#model-grid .model-chip').forEach(c=>c.classList.remove('active'));
       chip.classList.add('active');
       state.model = name;
       state.product = null;
@@ -507,6 +532,7 @@
 
     if(!senderName){ showStatus('err','Missing sender name','กรุณากรอกชื่อผู้ส่ง',''); return; }
     if(!state.line){ showStatus('err','Select a production line','กรุณาเลือกสายการผลิต',''); return; }
+    if(!state.machine){ showStatus('err','Select a machine','กรุณาเลือกเครื่องจักร',''); return; }
     if(!state.model){ showStatus('err','Select a model','กรุณาเลือกรุ่นโมเดล',''); return; }
     if(!state.product){ showStatus('err','Select a product','กรุณาเลือกโปรดักต์',''); return; }
     if(state.stations.size === 0){ showStatus('err','Select at least one station (L)','กรุณาเลือกตำแหน่ง L อย่างน้อย 1 ตำแหน่ง',''); return; }
@@ -526,6 +552,7 @@
         payload.append('timestamp', timestamp);
         payload.append('senderName', senderName);
         payload.append('line', state.line);
+        payload.append('machine', state.machine);
         payload.append('model', state.model);
         payload.append('product', state.product);
         payload.append('station', station);
@@ -536,11 +563,11 @@
       }
 
       showStatus('ok','Record saved','บันทึกข้อมูลสำเร็จ',
-        `<br>${senderName} · ${state.line} · ${state.model} · ${state.product} · ${stationList.join(', ')} · ${timestamp} ICT`);
+        `<br>${senderName} · ${state.line} · ${state.machine} · ${state.model} · ${state.product} · ${stationList.join(', ')} · ${timestamp} ICT`);
 
       form.reset();
       document.querySelectorAll('.rail-node, .model-chip, .sel-chip').forEach(n=>n.classList.remove('active'));
-      state = { line:null, model:null, product:null, stations:new Set() };
+      state = { line:null, machine:null, model:null, product:null, stations:new Set() };
       productGrid.innerHTML = '';
       lGrid.innerHTML = '';
       productPlaceholder.style.display = 'block';

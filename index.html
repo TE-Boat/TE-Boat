@@ -2,588 +2,712 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>TE Auto Core Assembly — PIN Change Record</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#063b8f">
+<title>Delta Welgrow Hub | Downtime & PIN Change Record</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#EFF6FF;
-    --surface:#FFFFFF;
-    --ink:#0B2036;
-    --ink-soft:#4C6480;
-    --ink-faint:#93A7BC;
-    --line:#DCEBFB;
-    --blue:#0B72E7;
-    --blue-dark:#0857B3;
-    --blue-deep:#083E82;
-    --sky:#1BA6E8;
-    --blue-light:#E8F3FE;
-    --blue-light-2:#F3F9FF;
-    --green:#128A5C;
-    --green-bg:#E4F6ED;
-    --red:#C0362B;
-    --red-bg:#FBEAE8;
-    --radius:14px;
-    --shadow:0 1px 2px rgba(11,32,54,0.05), 0 10px 28px rgba(11,114,231,0.08);
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:"IBM Plex Sans","IBM Plex Sans Thai",sans-serif;
-    -webkit-font-smoothing:antialiased;
-    min-height:100vh;
-  }
-  .mono{font-family:"IBM Plex Mono","IBM Plex Sans Thai",monospace;}
+:root{
+  --navy:#063b8f;
+  --blue:#0a6be0;
+  --sky:#1fa3ee;
+  --ice:#9fd8ff;
+  --ink:#0b2a5c;
+  --mut:#5b7aa6;
+  --line:#d3e5f8;
+  --soft:#f0f7ff;
+  --bad:#d64545;
+  --bad-bg:#fbeae8;
+  --green:#128a5c;
+  --green-bg:#e4f6ed;
+  --radius:16px;
+  --shadow:0 4px 20px rgba(10,80,170,0.08);
+}
 
-  /* ---------- header ---------- */
-  header{
-    background:linear-gradient(135deg,var(--blue-deep) 0%, var(--blue) 55%, var(--sky) 100%);
-    color:#fff;
-    padding:26px 18px 30px;
-    position:relative;
-    overflow:hidden;
-  }
-  header .dots{
-    position:absolute; inset:0; opacity:.16;
-    background-image:radial-gradient(#fff 1.4px, transparent 1.4px);
-    background-size:18px 18px;
-    -webkit-mask-image:linear-gradient(180deg,#000 0%, transparent 85%);
-            mask-image:linear-gradient(180deg,#000 0%, transparent 85%);
-  }
-  .header-inner{max-width:800px;margin:0 auto;position:relative;}
-  .brand-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
-  .brand-mark{
-    width:30px;height:30px;border-radius:8px;
-    background:#fff; color:var(--blue-dark);
-    display:flex;align-items:center;justify-content:center;
-    font-weight:700; font-size:14px; font-family:"IBM Plex Mono",monospace;
-    flex:0 0 auto;
-  }
-  .eyebrow{
-    font-size:12px; letter-spacing:.02em;
-    color:#DCEEFC; margin:0; line-height:1.5;
-  }
-  .eyebrow b{color:#fff;font-weight:600;}
-  h1{
-    font-size:27px; line-height:1.2; font-weight:700;
-    margin:0 0 4px; letter-spacing:-0.01em;
-  }
-  h1 .accent{color:#BFE3FF;}
-  .th-title{
-    font-size:15px; color:#DCEEFC; font-weight:400; margin:0 0 16px;
-  }
-  .header-meta{
-    display:flex; flex-wrap:wrap; gap:8px 18px;
-    font-size:12px; color:#BFDBF3;
-  }
-  .header-meta span b{color:#fff;font-weight:600;}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:"IBM Plex Sans","IBM Plex Sans Thai",sans-serif;
+  color:var(--ink);
+  background:#e9f2fc;
+  line-height:1.45;
+  padding-bottom:env(safe-area-inset-bottom,0);
+  -webkit-tap-highlight-color:transparent;
+  overflow-wrap:anywhere;
+}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+.mono{font-family:"IBM Plex Mono","IBM Plex Sans Thai",monospace;}
 
-  /* ---------- layout ---------- */
-  main{max-width:800px;margin:0 auto;padding:20px 16px 60px;}
-  .card{
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:20px 18px;
-    margin-bottom:16px;
-    transition:opacity .2s;
-  }
-  .card.disabled{opacity:.45; pointer-events:none;}
-  .section-label{
-    display:flex; align-items:baseline; justify-content:space-between;
-    margin-bottom:14px;
-  }
-  .section-label .num{
-    display:inline-flex; align-items:center; justify-content:center;
-    width:22px;height:22px;border-radius:7px;
-    background:var(--blue); color:#fff;
-    font-size:11px; font-weight:600; margin-right:8px;
-  }
-  .section-label .en{font-size:15px;font-weight:600;color:var(--ink);}
-  .section-label .th{font-size:12.5px;color:var(--ink-soft);margin-left:6px;}
+/* --- HERO HEADER --- */
+.hero{
+  background:radial-gradient(rgba(255,255,255,.14) 1px,transparent 1.4px) 0 0/18px 18px,
+              linear-gradient(100deg,#063b8f 0%,#0a6be0 55%,#1fa3ee 100%);
+  color:#fff;
+  padding:calc(22px + env(safe-area-inset-top,0)) 0 24px;
+  position:relative;
+}
+.org{display:flex;gap:12px;align-items:center}
+.logo{
+  width:44px;height:44px;border-radius:12px;background:#fff;
+  color:var(--blue);font-weight:700;display:grid;place-items:center;
+  flex:none;font-family:"IBM Plex Mono",monospace;font-size:1.1rem;
+  box-shadow:0 4px 12px rgba(0,0,0,0.12);
+}
+.org b{display:block;font-size:.92rem}.org span{display:block;font-size:.84rem;opacity:.92}
 
-  label.field-label{
-    display:block; font-size:13px; font-weight:500; color:var(--ink);
-    margin-bottom:6px;
-  }
-  label.field-label .th{color:var(--ink-soft);font-weight:400;}
-  input[type=text], input[type=password], textarea{
-    width:100%; font-family:inherit; font-size:15px;
-    padding:11px 12px; border:1.5px solid var(--line); border-radius:10px;
-    background:var(--blue-light-2); color:var(--ink);
-    outline:none; transition:border-color .15s, box-shadow .15s;
-  }
-  input:focus, textarea:focus{
-    border-color:var(--blue); box-shadow:0 0 0 3px rgba(11,114,231,0.12);
-    background:#fff;
-  }
-  textarea{resize:vertical; min-height:64px;}
-  .field{margin-bottom:14px;}
-  .field:last-child{margin-bottom:0;}
-  .hint{font-size:11.5px;color:var(--ink-faint);margin-top:8px;}
+.hero-title-area{margin:18px 0 14px;}
+h1{margin:0 0 4px;font-size:clamp(1.55rem,5.5vw,2.2rem);line-height:1.25;font-weight:700;letter-spacing:-0.01em;}
+h1 em{font-style:normal;color:var(--ice)}
+.sub{margin:0;opacity:.92;font-size:.92rem}
+.dev{margin-top:14px;font-size:.82rem;opacity:.9;display:flex;gap:6px 16px;flex-wrap:wrap}
 
-  /* ---------- station rail (signature element, 18 lines) ---------- */
-  .rail-wrap{overflow-x:auto; padding:6px 2px 12px; margin:0 -2px;
-    -webkit-overflow-scrolling:touch; scrollbar-width:thin;}
-  .rail{
-    display:flex; align-items:center; gap:0; min-width:max-content;
-    position:relative;
-  }
-  .rail-node{
-    display:flex; flex-direction:column; align-items:center; gap:6px;
-    cursor:pointer; padding:2px 9px; user-select:none;
-  }
-  .rail-dot{
-    width:36px; height:36px; border-radius:10px;
-    background:var(--blue-light-2); border:1.5px solid var(--line);
-    display:flex; align-items:center; justify-content:center;
-    font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:600;
-    color:var(--ink-soft);
-    transition:all .15s;
-  }
-  .rail-node .rail-label{font-size:9.5px;color:var(--ink-faint);font-weight:500;}
-  .rail-connector{width:16px;height:2px;background:var(--line);flex:0 0 auto;margin-top:-18px;}
-  .rail-node.active .rail-dot{
-    background:var(--blue); border-color:var(--blue);
-    color:#fff; transform:translateY(-2px);
-    box-shadow:0 4px 12px rgba(11,114,231,0.30);
-  }
-  .rail-node.active .rail-label{color:var(--blue-dark);font-weight:600;}
-  .rail-node:hover .rail-dot{border-color:var(--blue);}
+/* HUB TAB SWITCHER */
+.hub-tabs{
+  display:flex;gap:8px;margin-top:18px;
+  background:rgba(0,0,0,0.18);padding:6px;border-radius:16px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.hub-tab{
+  flex:1;background:transparent;border:none;color:#fff;
+  font:inherit;font-weight:600;font-size:.92rem;
+  padding:12px 14px;border-radius:12px;cursor:pointer;
+  transition:all .2s ease;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.hub-tab.active{
+  background:#fff;color:var(--navy);
+  box-shadow:0 4px 16px rgba(0,0,0,0.2);
+}
 
-  /* ---------- model chips ---------- */
-  .model-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
-  @media (min-width:520px){ .model-grid{grid-template-columns:repeat(4,1fr);} }
-  .model-chip{
-    padding:14px 8px; text-align:center; border-radius:12px;
-    border:1.5px solid var(--line); background:var(--blue-light-2);
-    cursor:pointer; transition:all .15s;
-  }
-  .model-chip .en{font-size:14.5px;font-weight:700;color:var(--ink);}
-  .model-chip .sub{display:block;font-size:10.5px;font-weight:400;color:var(--ink-faint);margin-top:3px;}
-  .model-chip.active{
-    background:var(--blue); border-color:var(--blue);
-  }
-  .model-chip.active .en{color:#fff;}
-  .model-chip.active .sub{color:#D6EBFF;}
+/* --- MAIN LAYOUT & CARDS --- */
+main{margin-top:22px;padding-bottom:12px}
+.view-section{display:none;}
+.view-section.active{display:block;}
 
-  /* ---------- generic selectable grid (Product / Station) ---------- */
-  .sel-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(52px,1fr)); gap:8px;}
-  .sel-chip{
-    position:relative;
-    padding:10px 4px; text-align:center; border-radius:9px;
-    border:1.5px solid var(--line); background:var(--blue-light-2);
-    cursor:pointer; font-family:"IBM Plex Mono",monospace;
-    font-size:12.5px; font-weight:600; color:var(--ink-soft);
-    transition:all .15s;
-  }
-  .sel-chip.active{
-    background:var(--blue); border-color:var(--blue); color:#fff;
-  }
-  .sel-chip.multi.active::after{
-    content:"✓"; position:absolute; top:-6px; right:-6px;
-    width:16px;height:16px;border-radius:50%;
-    background:var(--green); color:#fff; font-size:10px;
-    display:flex;align-items:center;justify-content:center;
-    border:2px solid #fff;
-  }
-  .sel-toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;}
-  .sel-toolbar button{
-    background:none;border:none;color:var(--blue);font-size:12px;font-weight:600;
-    cursor:pointer;font-family:inherit;padding:4px 0;
-  }
-  .sel-count{font-size:12px;color:var(--ink-faint);}
-  .placeholder-msg{font-size:12.5px;color:var(--ink-faint);padding:6px 2px;}
+form{display:flex;flex-direction:column;gap:16px}
+.card{
+  background:#fff;border-radius:var(--radius);padding:20px 18px;
+  border:1.5px solid var(--line);box-shadow:var(--shadow);
+  transition:border-color .2s, box-shadow .2s;
+  scroll-margin-top:16px;
+}
+.card.bad{border-color:var(--bad)}
+.card.done .num{background:linear-gradient(135deg,var(--blue),var(--sky));color:#fff}
+.card.done .num::before{content:"✓"}
+.card.done .num span{display:none}
 
-  /* ---------- PIN entry ---------- */
-  .pin-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
-  @media (max-width:420px){ .pin-row{grid-template-columns:1fr;} }
-  .pin-input-wrap{position:relative;}
-  .pin-input-wrap input{font-family:"IBM Plex Mono",monospace; letter-spacing:.04em;}
-  .pin-note{
-    display:flex; gap:8px; align-items:flex-start;
-    background:var(--blue-light); border:1px solid #C9E4FB;
-    border-radius:10px; padding:10px 12px; margin-top:14px;
-    font-size:12px; color:var(--blue-deep); line-height:1.5;
-  }
+.sec{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:6px 10px;margin:0 0 16px;padding-bottom:12px;
+  border-bottom:1px solid var(--line);font-size:1.02rem;font-weight:600
+}
+.sec-title{display:flex;align-items:center;gap:8px;}
+.num{
+  width:26px;height:26px;border-radius:8px;background:var(--line);
+  color:var(--blue);display:grid;place-items:center;font-size:.88rem;
+  font-style:normal;flex:none;transition:.2s;font-weight:700;
+}
+.sec small{color:var(--mut);font-weight:400;font-size:.84rem}
 
-  /* ---------- submit ---------- */
-  .submit-btn{
-    width:100%; padding:15px; border:none; border-radius:12px;
-    background:linear-gradient(135deg,var(--blue) 0%, var(--sky) 100%);
-    color:#fff; font-size:15.5px; font-weight:600;
-    cursor:pointer; font-family:inherit; letter-spacing:.01em;
-    transition:opacity .15s, transform .1s;
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    box-shadow:0 10px 24px rgba(11,114,231,0.28);
-  }
-  .submit-btn:active{transform:scale(0.99);}
-  .submit-btn:disabled{opacity:.55;cursor:not-allowed;box-shadow:none;}
-  .submit-btn:not(:disabled):hover{opacity:.92;}
+.err-t{display:none;color:var(--bad);font-size:.85rem;margin-top:10px;font-weight:500;}
+.card.bad .err-t{display:block}
 
-  .status-banner{
-    display:none; align-items:flex-start; gap:10px;
-    border-radius:10px; padding:12px 14px; margin-bottom:16px;
-    font-size:13.5px; line-height:1.5;
-  }
-  .status-banner.show{display:flex;}
-  .status-banner.ok{background:var(--green-bg); color:#0E5C3E; border:1px solid #BFE6D2;}
-  .status-banner.err{background:var(--red-bg); color:#7D211A; border:1px solid #F3C4BF;}
-  .status-banner b{display:block;margin-bottom:2px;}
+/* INPUTS & TEXTAREA */
+.lbl{display:block;font-size:.88rem;font-weight:600;margin:0 0 8px}.lbl small{color:var(--mut);font-weight:400}
+.lbl.req::after{content:" *";color:var(--blue);}
 
-  .req::after{content:" *"; color:var(--blue);}
+input[type=text],textarea{
+  display:block;width:100%;font:inherit;font-size:16px;padding:13px 14px;
+  border:1.5px solid var(--line);border-radius:12px;background:var(--soft);
+  color:var(--ink);transition:all .15s;
+}
+input[type=text]:focus,textarea:focus{
+  outline:none;border-color:var(--sky);box-shadow:0 0 0 4px rgba(31,163,238,0.2);background:#fff
+}
+input::placeholder,textarea::placeholder{color:#93aed2}
+textarea{min-height:110px;resize:vertical}
 
-  footer{
-    max-width:800px;margin:0 auto;padding:0 16px 30px;
-    font-size:11.5px;color:var(--ink-faint);text-align:center;
-  }
+.who{margin-top:10px;font-size:.9rem;min-height:1.3em;color:var(--mut)}
+.who.ok{color:#0a7a4b;font-weight:600}
+
+/* CHIPS & SELECTORS */
+.chips{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
+.lines{grid-template-columns:repeat(3,1fr)}
+.chip{position:relative;display:block}
+.chip input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer}
+.chip span{
+  display:flex;flex-direction:column;justify-content:center;height:100%;
+  min-height:54px;padding:10px 12px;border:1.5px solid var(--line);
+  border-radius:12px;background:var(--soft);font-size:.92rem;line-height:1.3;transition:.15s;
+}
+.lines .chip span{align-items:center;text-align:center;min-height:48px;font-weight:600;font-size:.9rem}
+.chip span small{color:var(--mut);font-size:.78rem;margin-top:2px}
+.chip:hover span{border-color:var(--sky)}
+.chip input:checked+span{
+  background:linear-gradient(135deg,var(--blue),var(--sky));
+  border-color:transparent;color:#fff;box-shadow:0 4px 12px rgba(10,107,224,.3)
+}
+.chip input:checked+span small{color:#e3f3ff}
+.cnt{text-align:right;font-size:.78rem;color:var(--mut);margin-top:6px}
+
+/* PHOTO DROPZONE */
+.photo-box{
+  border:2px dashed #7cc0f5;border-radius:14px;padding:20px 16px;
+  text-align:center;background:var(--soft);transition:all .2s;
+}
+.photo-box input{display:none}
+.pick-btn{
+  display:inline-flex;align-items:center;gap:6px;background:#fff;
+  border:1.5px solid var(--sky);color:var(--blue);padding:10px 20px;
+  border-radius:24px;font-weight:600;cursor:pointer;font-size:.92rem;
+  box-shadow:0 2px 8px rgba(10,107,224,0.08);transition:all .15s;
+}
+.pick-btn:hover{background:var(--soft);}
+.pv{display:none;position:relative;margin:14px auto 0;width:fit-content;max-width:100%}
+#dt-prev{display:block;max-width:100%;max-height:260px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+#dt-rm{
+  position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;
+  border:0;background:rgba(214,69,69,.95);color:#fff;font-size:16px;
+  cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:grid;place-items:center;
+}
+
+/* BUTTONS & MESSAGES */
+.save{
+  display:flex;justify-content:center;align-items:center;gap:10px;
+  width:100%;min-height:54px;padding:14px;font:inherit;font-size:1.08rem;
+  font-weight:700;color:#fff;border:0;border-radius:14px;cursor:pointer;
+  background:linear-gradient(100deg,var(--navy),var(--blue) 55%,var(--sky));
+  box-shadow:0 8px 20px rgba(10,107,224,.35);transition:all .2s;
+}
+.save:active{transform:scale(0.99);}
+.save:disabled{opacity:.65;cursor:default}
+.spin{width:18px;height:18px;border:3px solid #fff6;border-top-color:#fff;border-radius:50%;animation:s .8s linear infinite;display:none}
+.save:disabled .spin{display:block}@keyframes s{to{transform:rotate(360deg)}}
+
+.msg{display:none;padding:14px 16px;border-radius:12px;text-align:center;font-weight:600;margin-top:14px;font-size:.95rem;}
+.msg.ok{background:var(--green-bg);color:#085738;border:1px solid #a3e2c3}
+.msg.err{background:var(--bad-bg);color:#8a1f1f;border:1px solid #f3b1ab}
+
+.conn{
+  text-align:center;font-size:.84rem;padding:10px 12px;border-radius:12px;
+  background:#fff;border:1px solid var(--line);color:var(--mut);margin-bottom:14px;
+}
+.conn.good{color:#0a7a4b;border-color:#9fdcc0;background:#effaf4}
+.conn.bad{color:#a11;border-color:#f0b3b3;background:#fff3f3}
+
+.hint{font-size:11.5px;color:var(--mut);margin-top:8px;}
+footer{text-align:center;color:var(--mut);font-size:.82rem;padding:24px 16px 36px}
+
+@media(min-width:640px){
+  .card{padding:24px}
+  .lines{grid-template-columns:repeat(6,1fr)}
+  .cats .chips{grid-template-columns:repeat(3,1fr)}
+  #dt-macs{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:420px){ .pin-row{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="dots"></div>
-  <div class="header-inner">
-    <div class="brand-row">
-      <div class="brand-mark">TE</div>
-      <p class="eyebrow"><b>Delta Electronics (Thailand) PCL.</b><br>บริษัท เดลต้าอีเลคโทรนิคส์ (ประเทศไทย) จำกัด (มหาชน)</p>
-    </div>
-    <h1>TE <span class="accent">Auto Core</span> Assembly</h1>
-    <p class="th-title">ระบบบันทึกการเปลี่ยนพิน — สายการประกอบแกนอัตโนมัติ (PIN Change Record)</p>
-    <div class="header-meta">
-      <span>Developed by <b>TE Pongnupa (Boat)</b></span>
-      <span id="clock-display"></span>
-    </div>
+<section class="hero"><div class="wrap">
+  <div class="org">
+    <div class="logo">AE</div>
+    <div><b>Delta Electronics (Thailand) PCL.</b><span>บริษัท เดลต้าอีเลคโทรนิคส์ (ประเทศไทย) จำกัด (มหาชน)</span></div>
   </div>
-</header>
+  
+  <div class="hero-title-area">
+    <h1 id="hero-title">Machine <em>Downtime</em> Record</h1>
+    <p class="sub" id="hero-sub">ระบบบันทึกเครื่องจักรหยุดทำงาน — Delta Welgrow</p>
+  </div>
 
-<main>
-  <div id="status-banner" class="status-banner"></div>
+  <!-- HUB TAB SWITCHER -->
+  <div class="hub-tabs">
+    <button type="button" class="hub-tab active" data-target="dt-view">
+      <span>Downtime Record</span>
+    </button>
+    <button type="button" class="hub-tab" data-target="pin-view">
+      <span>PIN Change Record</span>
+    </button>
+  </div>
 
-  <form id="pin-form">
+  <div class="dev"><span>Developed by <b>AE Pongnupa (Boat)</b></span><span id="clock"></span></div>
+</div></section>
 
-    <!-- Recorder -->
-    <div class="card">
-      <div class="section-label">
-        <div><span class="num">1</span><span class="en">Recorder</span><span class="th">ผู้บันทึก</span></div>
-      </div>
-      <div class="field">
-        <label class="field-label req">Sender name <span class="th">ชื่อผู้ส่ง</span></label>
-        <input type="text" id="senderName" name="senderName" placeholder="e.g. Somchai Jaidee" autocomplete="name" required>
-      </div>
-    </div>
+<main class="wrap">
 
-    <!-- Production line -->
-    <div class="card">
-      <div class="section-label">
-        <div><span class="num">2</span><span class="en">Production line</span><span class="th">สายการผลิต</span></div>
-      </div>
-      <div class="rail-wrap">
-        <div class="rail" id="line-rail"></div>
-      </div>
-      <p class="hint">Select the assembly line / เลือกสายการผลิต (A-CORE-01 – A-CORE-18)</p>
-    </div>
-
-    <!-- Machine -->
-    <div class="card">
-      <div class="section-label">
-        <div><span class="num">3</span><span class="en">Machine</span><span class="th">เครื่องจักร</span></div>
-      </div>
-      <div class="model-grid" id="machine-grid"></div>
-      <p class="hint">Select the machine used / เลือกเครื่องจักรที่ใช้งาน</p>
-    </div>
-
-    <!-- Model -->
-    <div class="card">
-      <div class="section-label">
-        <div><span class="num">4</span><span class="en">Model</span><span class="th">รุ่นโมเดล</span></div>
-      </div>
-      <div class="model-grid" id="model-grid"></div>
-      <p class="hint">Choosing a model sets the available Product and Station range below. / เลือกโมเดลเพื่อกำหนดช่วง Product และ Station ด้านล่าง</p>
-    </div>
-
-    <!-- Product -->
-    <div class="card" id="product-card">
-      <div class="section-label">
-        <div><span class="num">5</span><span class="en">Product</span><span class="th">โปรดักต์</span></div>
-        <span class="sel-count" id="product-count"></span>
-      </div>
-      <div id="product-grid" class="sel-grid"></div>
-      <p class="placeholder-msg" id="product-placeholder">Select a model first / กรุณาเลือกรุ่นโมเดลก่อน</p>
-    </div>
-
-    <!-- Station -->
-    <div class="card" id="station-card">
-      <div class="section-label">
-        <div><span class="num">6</span><span class="en">Station</span><span class="th">ตำแหน่ง L</span></div>
-      </div>
-      <div class="sel-toolbar">
-        <span class="sel-count" id="l-count">0 selected · เลือกแล้ว 0 ตำแหน่ง</span>
-        <button type="button" id="l-clear">Clear — ล้าง</button>
-      </div>
-      <div id="l-grid" class="sel-grid"></div>
-      <p class="placeholder-msg" id="station-placeholder">Select a model first / กรุณาเลือกรุ่นโมเดลก่อน</p>
-      <p class="hint" id="station-hint" style="display:none;">Choose any station(s) for this product — multiple selections allowed. / เลือกได้มากกว่า 1 ตำแหน่ง</p>
-    </div>
-
-    <!-- PIN details -->
-    <div class="card">
-      <div class="section-label">
-        <div><span class="num">7</span><span class="en">PIN details</span><span class="th">ข้อมูลพิน</span></div>
-      </div>
-      <div class="pin-row">
-        <div class="field">
-          <label class="field-label req">Old PIN <span class="th">พินเดิม</span></label>
-          <div class="pin-input-wrap">
-            <input type="text" id="oldPin" name="oldPin" inputmode="numeric" pattern="[0-9]*" placeholder="0000" required>
-          </div>
+  <!-- ================= VIEW 1: DOWNTIME RECORD ================= -->
+  <div id="dt-view" class="view-section active">
+    <form id="dt-form" novalidate>
+      <div class="card" id="dt-c1">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>1</span></i><span>ผู้บันทึก <small>/ Reporter</small></span></div>
         </div>
-        <div class="field">
-          <label class="field-label req">New PIN <span class="th">พินใหม่</span></label>
-          <div class="pin-input-wrap">
-            <input type="text" id="newPin" name="newPin" inputmode="numeric" pattern="[0-9]*" placeholder="0000" required>
-          </div>
+        <label class="lbl req" for="dt-emp">รหัสพนักงาน <small>/ Employee ID</small></label>
+        <input type="text" id="dt-emp" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="เช่น / e.g. 86654441">
+        <div class="who" id="dt-who"></div>
+        <div class="err-t">กรุณากรอกรหัสพนักงาน / Please enter your Employee ID</div>
+      </div>
+
+      <div class="card" id="dt-c2">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>2</span></i><span>สายการผลิต <small>/ Production Line</small></span></div>
+        </div>
+        <div class="chips lines" id="dt-lines"></div>
+        <div class="err-t">กรุณาเลือกสายการผลิต / Please select a production line</div>
+      </div>
+
+      <div class="card cats" id="dt-c3">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>3</span></i><span>หมวดปัญหา <small>/ Problem Category</small></span></div>
+        </div>
+        <div class="chips" id="dt-cats"></div>
+        <div class="err-t">กรุณาเลือกหมวดปัญหา / Please select a category</div>
+      </div>
+
+      <div class="card" id="dt-c4">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>4</span></i><span>เครื่องจักร <small>/ Machine</small></span></div>
+        </div>
+        <div class="chips" id="dt-macs"></div>
+        <div class="err-t">กรุณาเลือกเครื่องจักร / Please select a machine</div>
+      </div>
+
+      <div class="card" id="dt-c5">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>5</span></i><span>รายละเอียด <small>/ Details</small></span></div>
+        </div>
+        <label class="lbl req" for="dt-det">รายละเอียดปัญหา <small>/ Problem details</small></label>
+        <textarea id="dt-det" maxlength="1000" placeholder="อธิบายอาการ สาเหตุ และการแก้ไข / Describe symptom, cause and action taken..."></textarea>
+        <div class="cnt"><span id="dt-n">0</span>/1000</div>
+        <div class="err-t">กรุณาเขียนรายละเอียดปัญหา / Please describe the problem</div>
+        
+        <div style="height:16px;"></div>
+        <label class="lbl">รูปภาพประกอบ <small>/ Photo (optional)</small></label>
+        <div class="photo-box">
+          <label class="pick-btn" for="dt-img">เลือกรูปภาพจากที่จัดเก็บ / Choose photo</label>
+          <input type="file" id="dt-img" accept="image/*">
+          <div class="pv" id="dt-pv"><img id="dt-prev" alt=""><button type="button" id="dt-rm" aria-label="Remove">✕</button></div>
         </div>
       </div>
-      <div class="pin-note">
-        <span>ⓘ</span>
-        <span>Enter the exact old and new PIN numbers — double-check before saving. / กรอกตัวเลขพินเดิมและพินใหม่ให้ถูกต้อง ตรวจสอบก่อนบันทึก</span>
-      </div>
-    </div>
 
-    <!-- Remark -->
-    <div class="card">
-      <div class="section-label">
-        <div><span class="num">8</span><span class="en">Remark</span><span class="th">หมายเหตุ</span><span class="th" style="margin-left:6px;color:var(--ink-faint)">(optional / ไม่บังคับ)</span></div>
-      </div>
-      <textarea id="remark" name="remark" placeholder="Additional notes…"></textarea>
-    </div>
+      <div class="conn" id="dt-conn">กำลังตรวจสอบการเชื่อมต่อ Downtime... / Checking connection...</div>
+      <button class="save" id="dt-btn" type="submit"><i class="spin"></i><span id="dt-bt">บันทึก Downtime / Save Record</span></button>
+      <div class="msg" id="dt-msg" role="status"></div>
+    </form>
+  </div>
 
-    <button type="submit" class="submit-btn" id="submit-btn">Save record — บันทึกข้อมูล</button>
-  </form>
+
+  <!-- ================= VIEW 2: PIN CHANGE RECORD ================= -->
+  <div id="pin-view" class="view-section">
+    <form id="pin-form" novalidate>
+      <div class="card" id="pin-c1">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>1</span></i><span>ผู้บันทึก <small>/ Reporter</small></span></div>
+        </div>
+        <label class="lbl req" for="pin-emp">รหัสพนักงาน <small>/ Employee ID</small></label>
+        <input type="text" id="pin-emp" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="เช่น / e.g. 86654441">
+        <div class="who" id="pin-who"></div>
+        <div class="err-t">กรุณากรอกรหัสพนักงาน / Please enter your Employee ID</div>
+      </div>
+
+      <div class="card" id="pin-c2">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>2</span></i><span>สายการผลิต <small>/ Production Line</small></span></div>
+        </div>
+        <div class="chips lines" id="pin-lines"></div>
+        <div class="err-t">กรุณาเลือกสายการผลิต / Please select production line</div>
+      </div>
+
+      <div class="card" id="pin-c3">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>3</span></i><span>เครื่องจักร <small>/ Machine</small></span></div>
+        </div>
+        <div class="chips" id="pin-machines"></div>
+        <div class="err-t">กรุณาเลือกเครื่องจักร / Please select machine</div>
+      </div>
+
+      <div class="card" id="pin-c4">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>4</span></i><span>รุ่นโมเดล <small>/ Model</small></span></div>
+        </div>
+        <div class="chips" id="pin-models"></div>
+        <div class="err-t">กรุณาเลือกรุ่นโมเดล / Please select model</div>
+      </div>
+
+      <div class="card" id="pin-c5">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>5</span></i><span>โปรดักต์ <small>/ Product</small></span></div>
+        </div>
+        <div class="chips" id="pin-products"></div>
+        <div class="hint" id="pin-product-hint">กรุณาเลือกรุ่นโมเดลก่อน / Select a model first</div>
+        <div class="err-t">กรุณาเลือกโปรดักต์ / Please select product</div>
+      </div>
+
+      <div class="card" id="pin-c6">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>6</span></i><span>ตำแหน่ง L <small>/ Station</small></span></div>
+        </div>
+        <div class="chips" id="pin-stations" style="grid-template-columns:repeat(4,1fr);"></div>
+        <div class="hint" id="pin-station-hint">กรุณาเลือกรุ่นโมเดลก่อน / Select a model first</div>
+        <div class="err-t">กรุณาเลือกตำแหน่ง L อย่างน้อย 1 ตำแหน่ง / Please select at least 1 station</div>
+      </div>
+
+      <div class="card" id="pin-c7">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>7</span></i><span>ข้อมูลพิน <small>/ PIN Details</small></span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label class="lbl req" for="pin-oldPin">Old PIN <small>/ พินเดิม</small></label>
+            <input type="text" id="pin-oldPin" inputmode="numeric" placeholder="0000" required>
+          </div>
+          <div>
+            <label class="lbl req" for="pin-newPin">New PIN <small>/ พินใหม่</small></label>
+            <input type="text" id="pin-newPin" inputmode="numeric" placeholder="0000" required>
+          </div>
+        </div>
+        <div class="err-t">กรุณากรอกพินเดิมและพินใหม่ให้ครบถ้วน / Please enter both old and new PINs</div>
+      </div>
+
+      <div class="card" id="pin-c8">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>8</span></i><span>หมายเหตุ <small>/ Remark (optional)</small></span></div>
+        </div>
+        <textarea id="pin-remark" placeholder="Additional notes…"></textarea>
+      </div>
+
+      <div class="conn" id="pin-conn">กำลังตรวจสอบการเชื่อมต่อ PIN Change... / Checking connection...</div>
+      <button type="submit" class="save" id="pin-submit-btn"><i class="spin"></i><span id="pin-bt">บันทึก PIN Change / Save Record</span></button>
+      <div class="msg" id="pin-msg" role="status"></div>
+    </form>
+  </div>
+
 </main>
 
-<footer>
-  TE Auto Core Assembly · Delta Electronics (Thailand) PCL. · Internal use only<br>
-  Data is saved to Google Sheets — “PIN change record”
-</footer>
+<footer>© Delta Electronics (Thailand) PCL. · AE Auto Core Assembly Hub<br>Created by AE Pongnupa (Boat)</footer>
 
 <script>
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbwUwKHP6AGPjhhn_jWa3KofAhAb4d16xwGYf1mZkoj8rc6g2bUbkWYMGlIWIeiokYov6A/exec";
+// --- API CONFIGURATION ---
+const DT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMiRfkJv3_1vBpG308UaPAfK-_ceWpmNZONCEA88peITDhYwKEV8L6vlRAhNYemk3Atw/exec";
+const PIN_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUwKHP6AGPjhhn_jWa3KofAhAb4d16xwGYf1mZkoj8rc6g2bUbkWYMGlIWIeiokYov6A/exec";
 
-  // Model -> Product count / Station count
-  const MODEL_CONFIG = {
-    "BGA2.0": { products: 4,  stations: 16, sub: "P1–P4 · L1–L16" },
-    "A2":     { products: 4,  stations: 16, sub: "P1–P4 · L1–L16" },
-    "U50SU":  { products: 36, stations: 1,  sub: "P1–P36 · L1" },
-    "D50":    { products: 9,  stations: 2,  sub: "P1–P9 · L1–L2" }
+// --- EMPLOYEES DATABASE ---
+const EMPLOYEES = {
+  "86654441": "Pongnupa Pechsan",
+  "86709599": "Naruenat Buakaew",
+  "86718940": "Phatsakon Promsu",
+  "86692768": "Patcharapong Nukham",
+  "86709535": "Preechadet Phonsila",
+  "86692722": "Athicha Wanta",
+  "86716053": "Pichanon Limthaisong",
+  "86704898": "Panupong Panthong",
+  "86704919": "Natthaphon Deekhuntod",
+  "86709553": "Kritsana Liphhrom",
+  "86704923": "Tiwanon Tanupai",
+  "86718712": "Sitthichai Chroeysin",
+  "86709549": "Boonsak Hongaram",
+  "86721246": "Patchaya Kaewman",
+  "86692754": "Suppawit Aromram",
+  "86639140": "Anuchit Harhao",
+  "86641800": "Kokiad Tokhet",
+  "86704905": "Preecha Napang",
+  "86692740": "Kittitach Sunansa",
+  "86639172": "Chirasak Chetkasikorn",
+  "86641305": "Phonsawat Paiyaphrom",
+  "86692736": "Phumin Munchart",
+  "86546672": "Kanyarat Singsom"
+};
+
+const LINES = Array.from({length:18},(_,i)=>"A-CORE-"+String(i+1).padStart(2,"0"));
+
+// --- CLOCK DISPLAY ---
+function tick(){
+  const str = new Date().toLocaleString("en-GB",{timeZone:"Asia/Bangkok",day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false})+" ICT";
+  document.getElementById("clock").textContent = str;
+}
+tick(); setInterval(tick, 1000);
+
+// --- TAB SWITCHER LOGIC ---
+const tabs = document.querySelectorAll(".hub-tab");
+const views = document.querySelectorAll(".view-section");
+const heroTitle = document.getElementById("hero-title");
+const heroSub = document.getElementById("hero-sub");
+
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    tabs.forEach(t => t.classList.remove("active"));
+    views.forEach(v => v.classList.remove("active"));
+    
+    tab.classList.add("active");
+    const targetId = tab.getAttribute("data-target");
+    document.getElementById(targetId).classList.add("active");
+
+    if(targetId === "dt-view"){
+      heroTitle.innerHTML = 'Machine <em>Downtime</em> Record';
+      heroSub.textContent = 'ระบบบันทึกเครื่องจักรหยุดทำงาน — Delta Welgrow';
+    } else {
+      heroTitle.innerHTML = 'PIN<em> Change</em> Record';
+      heroSub.textContent = 'ระบบบันทึกการเปลี่ยนพิน — Delta Welgrow';
+    }
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+});
+
+
+// ==========================================
+// 1. DOWNTIME RECORD LOGIC
+// ==========================================
+const CATS=[["Mechanic","เครื่องกล"],["Electricity","ไฟฟ้า"],["MES","ระบบ MES"],["Program","โปรแกรม"],["Pneumatic system","ระบบนิวเมติก"]];
+const MACHINES=["Total","Magazine loader","PWB Flipping","Puma ultra","Auto PCB loader","Spider","Fox ultra","Auto multi-function (A)","Auto inductance 01","Oven","Auto multi-function (D)","Auto inductance 02","AOI","Magazine Unloader"];
+
+let dtPhoto="";
+document.getElementById("dt-lines").innerHTML=LINES.map(l=>`<label class="chip"><input type="radio" name="dt-line" value="${l}"><span>${l}</span></label>`).join("");
+document.getElementById("dt-cats").innerHTML=CATS.map((c,i)=>`<label class="chip"><input type="radio" name="dt-cat" value="${c[0]}"><span>${i+1}. ${c[0]}<small>${c[1]}</small></span></label>`).join("");
+document.getElementById("dt-macs").innerHTML=MACHINES.map((m,i)=>`<label class="chip"><input type="radio" name="dt-mac" value="${m}"><span>${i+1}. ${m}</span></label>`).join("");
+
+const dtVal=n=>(document.querySelector(`input[name=${n}]:checked`)||{}).value||"";
+const dtChecks={
+  c1:()=>document.getElementById("dt-emp").value.trim().length>0,
+  c2:()=>!!dtVal("dt-line"),
+  c3:()=>!!dtVal("dt-cat"),
+  c4:()=>!!dtVal("dt-mac"),
+  c5:()=>document.getElementById("dt-det").value.trim().length>0
+};
+
+function refreshDt(){
+  for(const k in dtChecks){
+    const ok=dtChecks[k](), card=document.getElementById("dt-"+k);
+    card.classList.toggle("done",ok);
+    if(ok) card.classList.remove("bad");
+  }
+}
+document.getElementById("dt-form").addEventListener("input", refreshDt);
+document.getElementById("dt-form").addEventListener("change", refreshDt);
+
+document.getElementById("dt-emp").oninput=e=>{
+  const el = e.target;
+  el.value = el.value.replace(/\s/g,"");
+  const id = el.value, w = document.getElementById("dt-who");
+  if(!id){w.textContent="";w.className="who"}
+  else if(EMPLOYEES[id]){w.textContent="✓ "+EMPLOYEES[id];w.className="who ok"}
+  else{w.textContent="ไม่พบรายชื่อ จะบันทึกเฉพาะรหัส / ID only will be saved";w.className="who"}
+};
+document.getElementById("dt-det").oninput=e=>{
+  document.getElementById("dt-n").textContent = e.target.value.length;
+};
+
+document.getElementById("dt-img").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{const im=new Image();im.onload=()=>{
+    const s=Math.min(1,1000/Math.max(im.width,im.height)),c=document.createElement("canvas");
+    c.width=im.width*s;c.height=im.height*s;c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+    dtPhoto=c.toDataURL("image/jpeg",.75);
+    document.getElementById("dt-prev").src=dtPhoto;
+    document.getElementById("dt-pv").style.display="block";
+  };im.src=r.result};
+  r.readAsDataURL(f);
+};
+document.getElementById("dt-rm").onclick=()=>{dtPhoto="";document.getElementById("dt-img").value="";document.getElementById("dt-pv").style.display="none"};
+
+function showDtMsg(t,ok){
+  const m=document.getElementById("dt-msg");
+  m.textContent=t; m.className=ok?"msg ok show":"msg err show"; m.style.display="block";
+  m.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+async function pingDt(){
+  const el=document.getElementById("dt-conn");
+  try{
+    const r=await fetch(DT_SCRIPT_URL,{cache:"no-store"});const j=await r.json();
+    if(!(j&&j.ok))throw 0;
+    el.textContent="🟢 เชื่อมต่อ Google Sheets แล้ว / Connected";el.className="conn good";
+  }catch(e){
+    el.textContent="🔴 ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ Downtime ได้";el.className="conn bad";
+  }
+}
+
+document.getElementById("dt-form").onsubmit=async e=>{
+  e.preventDefault();
+  let first=null;
+  for(const k in dtChecks){
+    if(!dtChecks[k]()){document.getElementById("dt-"+k).classList.add("bad");first=first||document.getElementById("dt-"+k);}
+  }
+  if(first){first.scrollIntoView({behavior:"smooth",block:"center"});showDtMsg("กรุณากรอกข้อมูล Downtime ให้ครบถ้วน",false);return;}
+  
+  const id=document.getElementById("dt-emp").value.trim();
+  const data={
+    time:new Date().toLocaleString("sv-SE",{timeZone:"Asia/Bangkok"}),
+    empId:id, name:EMPLOYEES[id]||"", line:dtVal("dt-line"),
+    category:dtVal("dt-cat"), machine:dtVal("dt-mac"),
+    details:document.getElementById("dt-det").value.trim(), photo:dtPhoto
   };
 
-  const MACHINES = ["Auto Inductance 01", "Auto Inductance 02"];
+  const btn=document.getElementById("dt-btn");
+  btn.disabled=true; document.getElementById("dt-bt").textContent="กำลังบันทึก...";
+  document.getElementById("dt-msg").style.display="none";
 
-  // ---- clock ----
-  function updateClock(){
-    const now = new Date();
-    const opts = {timeZone:'Asia/Bangkok', hour12:false, year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'};
-    document.getElementById('clock-display').textContent = now.toLocaleString('en-GB', opts) + ' ICT';
-  }
-  updateClock(); setInterval(updateClock, 1000);
-
-  // ---- state ----
-  let state = { line: null, machine: null, model: null, product: null, stations: new Set() };
-
-  // ---- build line rail A-CORE-01..18 ----
-  const railEl = document.getElementById('line-rail');
-  for(let i=1;i<=18;i++){
-    const code = 'A-CORE-' + String(i).padStart(2,'0');
-    const node = document.createElement('div');
-    node.className = 'rail-node';
-    node.dataset.line = code;
-    node.innerHTML = `<div class="rail-dot mono">${String(i).padStart(2,'0')}</div><div class="rail-label">CORE-${String(i).padStart(2,'0')}</div>`;
-    node.addEventListener('click', ()=>{
-      document.querySelectorAll('.rail-node').forEach(n=>n.classList.remove('active'));
-      node.classList.add('active');
-      state.line = code;
-    });
-    railEl.appendChild(node);
-    if(i<18){
-      const conn = document.createElement('div');
-      conn.className = 'rail-connector';
-      railEl.appendChild(conn);
+  try{
+    const res=await fetch(DT_SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(data)});
+    const j=await res.json();
+    if(j&&j.ok){
+      showDtMsg("✅ บันทึก Downtime สำเร็จเรียบร้อย",true);
+      document.getElementById("dt-form").reset();
+      dtPhoto=""; document.getElementById("dt-pv").style.display="none";
+      document.getElementById("dt-who").textContent=""; document.getElementById("dt-n").textContent="0";
+      refreshDt(); window.scrollTo({top:0,behavior:"smooth"});
+    } else {
+      showDtMsg("❌ เซิร์ฟเวอร์ปฏิเสธข้อมูล: "+((j&&j.error)||"unknown"),false);
     }
+  }catch(err){
+    showDtMsg("❌ เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาตรวจสอบอินเทอร์เน็ต",false);
+  } finally {
+    btn.disabled=false; document.getElementById("dt-bt").textContent="บันทึก Downtime / Save Record";
   }
+};
 
-  // ---- build machine chips ----
-  const machineGrid = document.getElementById('machine-grid');
-  MACHINES.forEach(name=>{
-    const chip = document.createElement('div');
-    chip.className = 'model-chip';
-    chip.innerHTML = `<div class="en">${name}</div>`;
-    chip.addEventListener('click', ()=>{
-      document.querySelectorAll('#machine-grid .model-chip').forEach(c=>c.classList.remove('active'));
-      chip.classList.add('active');
-      state.machine = name;
-    });
-    machineGrid.appendChild(chip);
-  });
 
-  // ---- build model chips ----
-  const modelGrid = document.getElementById('model-grid');
-  Object.keys(MODEL_CONFIG).forEach(name=>{
-    const cfg = MODEL_CONFIG[name];
-    const chip = document.createElement('div');
-    chip.className = 'model-chip';
-    chip.innerHTML = `<div class="en">${name}</div><span class="sub">${cfg.sub}</span>`;
-    chip.addEventListener('click', ()=>{
-      document.querySelectorAll('#model-grid .model-chip').forEach(c=>c.classList.remove('active'));
-      chip.classList.add('active');
-      state.model = name;
-      state.product = null;
-      state.stations.clear();
-      buildProductGrid(cfg.products);
-      buildStationGrid(cfg.stations);
-    });
-    modelGrid.appendChild(chip);
-  });
+// ==========================================
+// 2. PIN CHANGE RECORD LOGIC
+// ==========================================
+const PIN_MODELS = {
+  "BGA2.0": { products: 4, stations: 16 },
+  "A2":     { products: 4, stations: 16 },
+  "U50SU":  { products: 36, stations: 1 },
+  "D50":    { products: 9, stations: 2 }
+};
+const PIN_MACHINES_LIST = ["Auto Inductance 01", "Auto Inductance 02"];
 
-  // ---- Product grid (single-select, size depends on model) ----
-  const productGrid = document.getElementById('product-grid');
-  const productPlaceholder = document.getElementById('product-placeholder');
-  const productCount = document.getElementById('product-count');
-  function buildProductGrid(count){
-    productGrid.innerHTML = '';
-    productPlaceholder.style.display = 'none';
-    productCount.textContent = `P1–P${count}`;
-    for(let i=1;i<=count;i++){
-      const code = 'P'+i;
-      const chip = document.createElement('div');
-      chip.className = 'sel-chip mono';
-      chip.textContent = code;
-      chip.addEventListener('click', ()=>{
-        document.querySelectorAll('#product-grid .sel-chip').forEach(c=>c.classList.remove('active'));
-        chip.classList.add('active');
-        state.product = code;
-      });
-      productGrid.appendChild(chip);
+document.getElementById("pin-lines").innerHTML = LINES.map(l => `<label class="chip"><input type="radio" name="pin-line" value="${l}"><span>${l}</span></label>`).join("");
+document.getElementById("pin-machines").innerHTML = PIN_MACHINES_LIST.map((m, i) => `<label class="chip"><input type="radio" name="pin-machine" value="${m}"><span>${i+1}. ${m}</span></label>`).join("");
+document.getElementById("pin-models").innerHTML = Object.keys(PIN_MODELS).map((mo, i) => `<label class="chip"><input type="radio" name="pin-model" value="${mo}"><span>${i+1}. ${mo}</span></label>`).join("");
+
+const pinVal = n => (document.querySelector(`input[name=${n}]:checked`) || {}).value || "";
+
+document.getElementById("pin-emp").oninput = e => {
+  const el = e.target;
+  el.value = el.value.replace(/\s/g,"");
+  const id = el.value, w = document.getElementById("pin-who");
+  if(!id){ w.textContent = ""; w.className = "who"; }
+  else if(EMPLOYEES[id]){ w.textContent = "✓ " + EMPLOYEES[id]; w.className = "who ok"; }
+  else { w.textContent = "ไม่พบรายชื่อ จะบันทึกเฉพาะรหัส / ID only will be saved"; w.className = "who"; }
+};
+
+function updatePinProductsAndStations(){
+  const model = pinVal("pin-model");
+  const pContainer = document.getElementById("pin-products");
+  const pHint = document.getElementById("pin-product-hint");
+  const sContainer = document.getElementById("pin-stations");
+  const sHint = document.getElementById("pin-station-hint");
+
+  if(!model){
+    pContainer.innerHTML = ""; pHint.style.display = "block";
+    sContainer.innerHTML = ""; sHint.style.display = "block";
+    return;
+  }
+  pHint.style.display = "none";
+  sHint.style.display = "none";
+  const cfg = PIN_MODELS[model];
+  
+  pContainer.innerHTML = Array.from({length: cfg.products}, (_, i) => `P${i+1}`).map(p => `<label class="chip"><input type="radio" name="pin-product" value="${p}"><span>${p}</span></label>`).join("");
+  sContainer.innerHTML = Array.from({length: cfg.stations}, (_, i) => `L${i+1}`).map(s => `<label class="chip"><input type="checkbox" name="pin-station" value="${s}"><span>${s}</span></label>`).join("");
+}
+
+document.querySelectorAll("input[name=pin-model]").forEach(el => {
+  el.addEventListener("change", updatePinProductsAndStations);
+});
+
+const pinChecks = {
+  c1: () => document.getElementById("pin-emp").value.trim().length > 0,
+  c2: () => !!pinVal("pin-line"),
+  c3: () => !!pinVal("pin-machine"),
+  c4: () => !!pinVal("pin-model"),
+  c5: () => !!pinVal("pin-product"),
+  c6: () => document.querySelectorAll("input[name=pin-station]:checked").length > 0,
+  c7: () => document.getElementById("pin-oldPin").value.trim().length > 0 && document.getElementById("pin-newPin").value.trim().length > 0
+};
+
+function refreshPin(){
+  for(const k in pinChecks){
+    const ok = pinChecks[k](), card = document.getElementById("pin-"+k);
+    card.classList.toggle("done", ok);
+    if(ok) card.classList.remove("bad");
+  }
+}
+document.getElementById("pin-form").addEventListener("input", refreshPin);
+document.getElementById("pin-form").addEventListener("change", refreshPin);
+
+function showPinMsg(t, ok){
+  const m = document.getElementById("pin-msg");
+  m.textContent = t; m.className = ok ? "msg ok show" : "msg err show"; m.style.display = "block";
+  m.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+
+async function pingPin(){
+  const el=document.getElementById("pin-conn");
+  try{
+    const r=await fetch(PIN_SCRIPT_URL,{cache:"no-store"});const j=await r.json();
+    if(!(j&&j.ok))throw 0;
+    el.textContent="🟢 เชื่อมต่อ Google Sheets แล้ว / Connected";el.className="conn good";
+  }catch(e){
+    el.textContent="🔴 ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ PIN Change ได้";el.className="conn bad";
+  }
+}
+
+document.getElementById("pin-form").onsubmit = async e => {
+  e.preventDefault();
+  let first = null;
+  for(const k in pinChecks){
+    if(!pinChecks[k]()){document.getElementById("pin-"+k).classList.add("bad");first=first||document.getElementById("pin-"+k);}
+  }
+  if(first){first.scrollIntoView({behavior:"smooth",block:"center"});showPinMsg("กรุณากรอกข้อมูล PIN Change ให้ครบถ้วน",false);return;}
+
+  const id = document.getElementById("pin-emp").value.trim();
+  const stations = Array.from(document.querySelectorAll("input[name=pin-station]:checked")).map(el => el.value).join(", ");
+  const payload = {
+    time: new Date().toLocaleString("sv-SE",{timeZone:"Asia/Bangkok"}),
+    empId: id,
+    name: EMPLOYEES[id] || "",
+    line: pinVal("pin-line"),
+    machine: pinVal("pin-machine"),
+    model: pinVal("pin-model"),
+    product: pinVal("pin-product"),
+    stations: stations,
+    oldPin: document.getElementById("pin-oldPin").value.trim(),
+    newPin: document.getElementById("pin-newPin").value.trim(),
+    remark: document.getElementById("pin-remark").value.trim()
+  };
+
+  const btn = document.getElementById("pin-submit-btn");
+  btn.disabled = true; document.getElementById("pin-bt").textContent = "กำลังบันทึก...";
+  document.getElementById("pin-msg").style.display = "none";
+
+  try{
+    const res = await fetch(PIN_SCRIPT_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(payload)});
+    const j = await res.json();
+    if(j && j.ok){
+      showPinMsg("✅ บันทึก PIN Change สำเร็จเรียบร้อย", true);
+      document.getElementById("pin-form").reset();
+      updatePinProductsAndStations();
+      document.getElementById("pin-who").textContent = "";
+      refreshPin(); window.scrollTo({top:0, behavior:"smooth"});
+    } else {
+      showPinMsg("❌ เซิร์ฟเวอร์ปฏิเสธข้อมูล: " + ((j && j.error) || "unknown"), false);
     }
+  }catch(err){
+    showPinMsg("❌ เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาตรวจสอบอินเทอร์เน็ต", false);
+  } finally {
+    btn.disabled = false; document.getElementById("pin-bt").textContent = "บันทึก PIN Change / Save Record";
   }
+};
 
-  // ---- Station grid (multi-select, size depends on model) ----
-  const lGrid = document.getElementById('l-grid');
-  const lCountEl = document.getElementById('l-count');
-  const stationPlaceholder = document.getElementById('station-placeholder');
-  const stationHint = document.getElementById('station-hint');
-  function updateLCount(){
-    lCountEl.textContent = `${state.stations.size} selected · เลือกแล้ว ${state.stations.size} ตำแหน่ง`;
-  }
-  function buildStationGrid(count){
-    lGrid.innerHTML = '';
-    stationPlaceholder.style.display = 'none';
-    stationHint.style.display = 'block';
-    for(let i=1;i<=count;i++){
-      const code = 'L'+i;
-      const chip = document.createElement('div');
-      chip.className = 'sel-chip multi mono';
-      chip.textContent = code;
-      chip.addEventListener('click', ()=>{
-        if(state.stations.has(code)){
-          state.stations.delete(code);
-          chip.classList.remove('active');
-        }else{
-          state.stations.add(code);
-          chip.classList.add('active');
-        }
-        updateLCount();
-      });
-      lGrid.appendChild(chip);
-    }
-    updateLCount();
-  }
-  document.getElementById('l-clear').addEventListener('click', ()=>{
-    state.stations.clear();
-    document.querySelectorAll('.sel-chip.multi').forEach(c=>c.classList.remove('active'));
-    updateLCount();
-  });
-
-  // ---- status banner ----
-  function showStatus(kind, titleEn, titleTh, bodyEn){
-    const el = document.getElementById('status-banner');
-    el.className = 'status-banner show ' + kind;
-    el.innerHTML = `<span>${kind==='ok' ? '✓' : '!'}</span><span><b>${titleEn} · ${titleTh}</b>${bodyEn}</span>`;
-    window.scrollTo({top:0, behavior:'smooth'});
-  }
-
-  // ---- submit ----
-  const form = document.getElementById('pin-form');
-  const submitBtn = document.getElementById('submit-btn');
-
-  form.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-
-    const senderName = document.getElementById('senderName').value.trim();
-    const oldPin = document.getElementById('oldPin').value.trim();
-    const newPin = document.getElementById('newPin').value.trim();
-    const remark = document.getElementById('remark').value.trim();
-
-    if(!senderName){ showStatus('err','Missing sender name','กรุณากรอกชื่อผู้ส่ง',''); return; }
-    if(!state.line){ showStatus('err','Select a production line','กรุณาเลือกสายการผลิต',''); return; }
-    if(!state.machine){ showStatus('err','Select a machine','กรุณาเลือกเครื่องจักร',''); return; }
-    if(!state.model){ showStatus('err','Select a model','กรุณาเลือกรุ่นโมเดล',''); return; }
-    if(!state.product){ showStatus('err','Select a product','กรุณาเลือกโปรดักต์',''); return; }
-    if(state.stations.size === 0){ showStatus('err','Select at least one station (L)','กรุณาเลือกตำแหน่ง L อย่างน้อย 1 ตำแหน่ง',''); return; }
-    if(!oldPin || !newPin){ showStatus('err','Enter old and new PIN','กรุณากรอกพินเดิมและพินใหม่',''); return; }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Saving… — กำลังบันทึก…';
-
-    const now = new Date();
-    const timestamp = now.toLocaleString('en-GB', {timeZone:'Asia/Bangkok'});
-    const stationList = Array.from(state.stations);
-
-    try{
-      // One row per selected station, so every recorded station is saved to Google Sheets
-      for(const station of stationList){
-        const payload = new FormData();
-        payload.append('timestamp', timestamp);
-        payload.append('senderName', senderName);
-        payload.append('line', state.line);
-        payload.append('machine', state.machine);
-        payload.append('model', state.model);
-        payload.append('product', state.product);
-        payload.append('station', station);
-        payload.append('oldPin', oldPin);
-        payload.append('newPin', newPin);
-        payload.append('remark', remark);
-        await fetch(GAS_URL, { method:'POST', mode:'no-cors', body: payload });
-      }
-
-      showStatus('ok','Record saved','บันทึกข้อมูลสำเร็จ',
-        `<br>${senderName} · ${state.line} · ${state.machine} · ${state.model} · ${state.product} · ${stationList.join(', ')} · ${timestamp} ICT`);
-
-      form.reset();
-      document.querySelectorAll('.rail-node, .model-chip, .sel-chip').forEach(n=>n.classList.remove('active'));
-      state = { line:null, machine:null, model:null, product:null, stations:new Set() };
-      productGrid.innerHTML = '';
-      lGrid.innerHTML = '';
-      productPlaceholder.style.display = 'block';
-      stationPlaceholder.style.display = 'block';
-      stationHint.style.display = 'none';
-      productCount.textContent = '';
-      updateLCount();
-
-    }catch(err){
-      showStatus('err','Could not save — check your connection','ไม่สามารถบันทึกได้ กรุณาตรวจสอบการเชื่อมต่อ','');
-    }finally{
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Save record — บันทึกข้อมูล';
-    }
-  });
+// Initial state check
+refreshDt();
+refreshPin();
+pingDt();
+pingPin();
 </script>
-
 </body>
 </html>

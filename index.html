@@ -118,12 +118,12 @@ form{display:flex;flex-direction:column;gap:16px}
 .lbl{display:block;font-size:.88rem;font-weight:600;margin:0 0 8px}.lbl small{color:var(--mut);font-weight:400}
 .lbl.req::after{content:" *";color:var(--blue);}
 
-input[type=text],textarea{
+input[type=text],input[type=time],textarea{
   display:block;width:100%;font:inherit;font-size:16px;padding:13px 14px;
   border:1.5px solid var(--line);border-radius:12px;background:var(--soft);
   color:var(--ink);transition:all .15s;
 }
-input[type=text]:focus,textarea:focus{
+input[type=text]:focus,input[type=time]:focus,textarea:focus{
   outline:none;border-color:var(--sky);box-shadow:0 0 0 4px rgba(31,163,238,0.2);background:#fff
 }
 input::placeholder,textarea::placeholder{color:#93aed2}
@@ -131,6 +131,22 @@ textarea{min-height:110px;resize:vertical}
 
 .who{margin-top:10px;font-size:.9rem;min-height:1.3em;color:var(--mut)}
 .who.ok{color:#0a7a4b;font-weight:600}
+
+/* TIME ROW & QUICK BUTTONS */
+.time-group{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.time-input-wrap{position:relative;}
+.time-btn-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.btn-now{
+  background:var(--soft);border:1px solid var(--sky);color:var(--blue);
+  padding:3px 10px;border-radius:14px;font-size:.78rem;font-weight:600;
+  cursor:pointer;transition:all .15s;
+}
+.btn-now:hover{background:var(--sky);color:#fff;}
+.time-diff-box{
+  margin-top:12px;padding:10px 14px;background:var(--soft);
+  border-radius:10px;font-size:.88rem;font-weight:600;color:var(--navy);
+  display:flex;align-items:center;justify-content:space-between;border:1px dashed var(--sky);
+}
 
 /* CHIPS & SELECTORS */
 .chips{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
@@ -206,7 +222,7 @@ footer{text-align:center;color:var(--mut);font-size:.82rem;padding:24px 16px 36p
   .cats .chips{grid-template-columns:repeat(3,1fr)}
   #dt-macs{grid-template-columns:repeat(3,1fr)}
 }
-@media(max-width:420px){ .pin-row{grid-template-columns:1fr;} }
+@media(max-width:520px){ .time-group{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -274,9 +290,37 @@ footer{text-align:center;color:var(--mut);font-size:.82rem;padding:24px 16px 36p
         <div class="err-t">กรุณาเลือกเครื่องจักร / Please select a machine</div>
       </div>
 
+      <!-- ส่วนที่ 5: เลือกเวลาเริ่ม-เสร็จ (เฉพาะเวลา) -->
       <div class="card" id="dt-c5">
         <div class="sec">
-          <div class="sec-title"><i class="num"><span>5</span></i><span>รายละเอียด <small>/ Details</small></span></div>
+          <div class="sec-title"><i class="num"><span>5</span></i><span>เวลาการแก้ไขปัญหา <small>/ Repair Time</small></span></div>
+        </div>
+        <div class="time-group">
+          <div class="time-input-wrap">
+            <div class="time-btn-row">
+              <label class="lbl req" for="dt-start" style="margin:0;">เวลาเริ่มซ่อม <small>/ Start Time</small></label>
+              <button type="button" class="btn-now" onclick="setCurrentTime('dt-start')">ตอนนี้</button>
+            </div>
+            <input type="time" id="dt-start">
+          </div>
+          <div class="time-input-wrap">
+            <div class="time-btn-row">
+              <label class="lbl req" for="dt-end" style="margin:0;">เวลาซ่อมเสร็จ <small>/ End Time</small></label>
+              <button type="button" class="btn-now" onclick="setCurrentTime('dt-end')">ตอนนี้</button>
+            </div>
+            <input type="time" id="dt-end">
+          </div>
+        </div>
+        <div class="time-diff-box" id="dt-duration-box" style="display:none;">
+          <span>รวมเวลาระยะหยุดทำงาน (Total Duration):</span>
+          <span id="dt-duration-text" class="mono">-</span>
+        </div>
+        <div class="err-t" id="dt-time-err">กรุณากรอกเวลาเริ่มซ่อมและเวลาซ่อมเสร็จให้ถูกต้อง</div>
+      </div>
+
+      <div class="card" id="dt-c6">
+        <div class="sec">
+          <div class="sec-title"><i class="num"><span>6</span></i><span>รายละเอียด <small>/ Details</small></span></div>
         </div>
         <label class="lbl req" for="dt-det">รายละเอียดปัญหา <small>/ Problem details</small></label>
         <textarea id="dt-det" maxlength="1000" placeholder="อธิบายอาการ สาเหตุ และการแก้ไข / Describe symptom, cause and action taken..."></textarea>
@@ -390,7 +434,7 @@ footer{text-align:center;color:var(--mut);font-size:.82rem;padding:24px 16px 36p
 
 <script>
 // --- API CONFIGURATION ---
-const DT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMiRfkJv3_1vBpG308UaPAfK-_ceWpmNZONCEA88peITDhYwKEV8L6vlRAhNYemk3Atw/exec";
+const DT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPnD6oCLcpDLPnzwg-Ey3-btvPMDsrq-HYhukcka5JwsEbwRM-WeBoZFG_muqYyWLM/exec";
 const PIN_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUwKHP6AGPjhhn_jWa3KofAhAb4d16xwGYf1mZkoj8rc6g2bUbkWYMGlIWIeiokYov6A/exec";
 
 // --- EMPLOYEES DATABASE ---
@@ -475,13 +519,62 @@ document.getElementById("dt-lines").innerHTML=LINES.map(l=>`<label class="chip">
 document.getElementById("dt-cats").innerHTML=CATS.map((c,i)=>`<label class="chip"><input type="radio" name="dt-cat" value="${c[0]}"><span>${i+1}. ${c[0]}<small>${c[1]}</small></span></label>`).join("");
 document.getElementById("dt-macs").innerHTML=MACHINES.map((m,i)=>`<label class="chip"><input type="radio" name="dt-mac" value="${m}"><span>${i+1}. ${m}</span></label>`).join("");
 
+function setCurrentTime(elemId){
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById(elemId).value = `${hours}:${minutes}`;
+  calculateDtDuration();
+  refreshDt();
+}
+
+function calculateDtDuration(){
+  const startVal = document.getElementById("dt-start").value;
+  const endVal = document.getElementById("dt-end").value;
+  const box = document.getElementById("dt-duration-box");
+  const txt = document.getElementById("dt-duration-text");
+  const errTxt = document.getElementById("dt-time-err");
+
+  if(startVal && endVal){
+    const [sHour, sMin] = startVal.split(":").map(Number);
+    const [eHour, eMin] = endVal.split(":").map(Number);
+    
+    let startMins = sHour * 60 + sMin;
+    let endMins = eHour * 60 + eMin;
+    let diffMins = endMins - startMins;
+
+    if(diffMins < 0){
+      diffMins += 24 * 60; // กรณีข้ามวัน (Overnight)
+    }
+
+    const hours = Math.floor(diffMins / 60);
+    const mins = diffMins % 60;
+    
+    let durationStr = `${diffMins} นาที (Mins)`;
+    if(hours > 0){
+      durationStr = `${hours} ชม. ${mins} นาที (${diffMins} mins)`;
+    }
+    
+    txt.textContent = durationStr;
+    box.style.display = "flex";
+    return true;
+  } else {
+    box.style.display = "none";
+    return false;
+  }
+}
+
+document.getElementById("dt-start").addEventListener("input", calculateDtDuration);
+document.getElementById("dt-end").addEventListener("input", calculateDtDuration);
+
 const dtVal=n=>(document.querySelector(`input[name=${n}]:checked`)||{}).value||"";
 const dtChecks={
   c1:()=>document.getElementById("dt-emp").value.trim().length>0,
   c2:()=>!!dtVal("dt-line"),
   c3:()=>!!dtVal("dt-cat"),
   c4:()=>!!dtVal("dt-mac"),
-  c5:()=>document.getElementById("dt-det").value.trim().length>0
+  c5:()=>calculateDtDuration(),
+  c6:()=>document.getElementById("dt-det").value.trim().length>0
 };
 
 function refreshDt(){
@@ -546,10 +639,21 @@ document.getElementById("dt-form").onsubmit=async e=>{
   if(first){first.scrollIntoView({behavior:"smooth",block:"center"});showDtMsg("กรุณากรอกข้อมูล Downtime ให้ครบถ้วน",false);return;}
   
   const id=document.getElementById("dt-emp").value.trim();
+  const startVal = document.getElementById("dt-start").value;
+  const endVal = document.getElementById("dt-end").value;
+
+  const [sH, sM] = startVal.split(":").map(Number);
+  const [eH, eM] = endVal.split(":").map(Number);
+  let totalMinutes = (eH * 60 + eM) - (sH * 60 + sM);
+  if(totalMinutes < 0) totalMinutes += 1440;
+
   const data={
     time:new Date().toLocaleString("sv-SE",{timeZone:"Asia/Bangkok"}),
     empId:id, name:EMPLOYEES[id]||"", line:dtVal("dt-line"),
     category:dtVal("dt-cat"), machine:dtVal("dt-mac"),
+    repairStart: startVal,
+    repairEnd: endVal,
+    totalDowntimeMinutes: totalMinutes,
     details:document.getElementById("dt-det").value.trim(), photo:dtPhoto
   };
 
@@ -565,6 +669,7 @@ document.getElementById("dt-form").onsubmit=async e=>{
       document.getElementById("dt-form").reset();
       dtPhoto=""; document.getElementById("dt-pv").style.display="none";
       document.getElementById("dt-who").textContent=""; document.getElementById("dt-n").textContent="0";
+      document.getElementById("dt-duration-box").style.display="none";
       refreshDt(); window.scrollTo({top:0,behavior:"smooth"});
     } else {
       showDtMsg("❌ เซิร์ฟเวอร์ปฏิเสธข้อมูล: "+((j&&j.error)||"unknown"),false);
